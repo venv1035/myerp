@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>用户管理测试</title>
+    <style>
+        body { font-family: Arial; max-width: 600px; margin: auto; padding: 40px; }
+        section { margin-bottom: 30px; padding: 20px; border: 1px solid #ccc; }
+        input { display: block; margin: 10px 0; padding: 8px; width: 100%; box-sizing: border-box; }
+        button { padding: 10px 20px; }
+        .error { color: red; }
+        .success { color: green; }
+    </style>
+</head>
+<body>
+    <h1>用户管理模块测试（用户名登录）</h1>
+    <div>
+        <label>服务器地址: <input id="baseUrl" value="http://127.0.0.1:8000"></label>
+    </div>
+
+    <!-- 注册 -->
+    <section>
+        <h2>注册</h2>
+        <input id="regUsername" placeholder="用户名">
+        <input id="regPassword" type="password" placeholder="密码">
+        <input id="regTenant" placeholder="公司名">
+        <input id="regName" placeholder="姓名（选填）">
+        <input id="regPhone" placeholder="手机（选填）">
+        <button onclick="register()">注册</button>
+        <p id="regMsg"></p>
+    </section>
+
+    <!-- 登录 -->
+    <section>
+        <h2>登录</h2>
+        <input id="loginUsername" placeholder="用户名">
+        <input id="loginPassword" type="password" placeholder="密码">
+        <label><input type="checkbox" id="rememberMe"> 记住我（30天）</label>
+        <button onclick="login()">登录</button>
+        <p id="loginMsg"></p>
+    </section>
+
+    <!-- 个人信息 -->
+    <section>
+        <h2>个人信息</h2>
+        <button onclick="getMe()">加载个人信息</button>
+        <pre id="meInfo"></pre>
+    </section>
+
+    <script>
+        let accessToken = '';
+
+        function api(path, method = 'GET', body = null, auth = true) {
+            const headers = { 'Content-Type': 'application/json' };
+            if (auth && accessToken) headers['Authorization'] = `Bearer ${accessToken}`;
+            const options = { method, headers };
+            if (body) options.body = JSON.stringify(body);
+            return fetch(document.getElementById('baseUrl').value + path, options)
+                .then(r => r.json().then(data => ({ ok: r.ok, status: r.status, data })));
+        }
+
+        async function register() {
+            const res = await api('/api/auth/register', 'POST', {
+                username: document.getElementById('regUsername').value,
+                password: document.getElementById('regPassword').value,
+                tenant_name: document.getElementById('regTenant').value,
+                full_name: document.getElementById('regName').value,
+                phone: document.getElementById('regPhone').value,
+            }, false);
+            document.getElementById('regMsg').textContent = res.data.detail || res.data.message || JSON.stringify(res.data);
+        }
+
+        async function login() {
+            const res = await api('/api/auth/login', 'POST', {
+                username: document.getElementById('loginUsername').value,
+                password: document.getElementById('loginPassword').value,
+                remember_me: document.getElementById('rememberMe').checked,
+            }, false);
+            if (res.ok) {
+                accessToken = res.data.access_token;
+                document.getElementById('loginMsg').textContent = '登录成功！Token已保存';
+            } else {
+                document.getElementById('loginMsg').textContent = res.data.detail || '登录失败';
+            }
+        }
+
+        async function getMe() {
+            const res = await api('/api/users/me');
+            document.getElementById('meInfo').textContent = JSON.stringify(res.data, null, 2);
+        }
+    </script>
+</body>
+</html>

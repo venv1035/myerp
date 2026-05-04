@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>数据库连接测试</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 40px; }
+        #status { font-size: 20px; margin-top: 20px; }
+        .ok { color: green; }
+        .error { color: red; }
+    </style>
+</head>
+<body>
+    <h1>轮胎批发 ERP - 数据库连接测试</h1>
+    <button onclick="testDb()">测试数据库连接</button>
+    <div id="status"></div>
+
+    <script>
+        async function testDb() {
+            const statusDiv = document.getElementById("status");
+            statusDiv.textContent = "检测中...";
+            try {
+                const response = await fetch("/api/health/db");
+                const data = await response.json();
+                if (data.database === "ok") {
+                    statusDiv.innerHTML = '<span class="ok">✅ 数据库连接成功</span>';
+                } else {
+                    statusDiv.innerHTML = `<span class="error">❌ 数据库连接失败: ${data.detail}</span>`;
+                }
+            } catch (err) {
+                statusDiv.innerHTML = `<span class="error">❌ 请求失败: ${err.message}</span>`;
+            }
+        }
+    </script>
+</body>
+</html>

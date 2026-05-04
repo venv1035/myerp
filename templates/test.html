@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>轮胎 ERP - 开发监控台</title>
+    <style>
+        body { font-family: sans-serif; background: #f4f4f9; padding: 20px; }
+        .card { background: white; border-radius: 8px; padding: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .status-ok { color: #2ecc71; font-weight: bold; }
+        .btn { background: #3498db; color: white; border: none; padding: 10px 20px; cursor: pointer; border-radius: 4px; font-size: 16px; }
+        .btn:hover { background: #2980b9; }
+        .data-badge { background: #e74c3c; color: white; padding: 2px 8px; border-radius: 10px; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>🔍 数据库实时状态</h1>
+        <p>链路状态: <span class="status-ok">{{ status }}</span></p>
+        <p>连接地址: <code>{{ url }}</code></p>
+        <p>当前库中轮胎条数: <span class="data-badge">{{ count }}</span></p>
+        <hr>
+        <h3>🛠️ 功能测试区</h3>
+        
+        <!-- 这里是关键：将 alert 改为真正的 POST 请求 -->
+        <form action="/test/add" method="post">
+            <button type="submit" class="btn">🚀 往数据库塞一条“朝阳轮胎”</button>
+        </form>
+        
+        <p><i>(每点一次，数量应该自增 1)</i></p>
+    </div>
+</body>
+</html>
